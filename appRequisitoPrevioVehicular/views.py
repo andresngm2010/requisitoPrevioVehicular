@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentTypeManager, ContentType
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
@@ -10,18 +9,14 @@ from django.contrib.admin.models import LogEntry
 from .models import Vehiculo, Multa
 from .forms import VehiculoForm, MultaForm
 
+from appRequisitoPrevioVehicular.encrypt_util import *
+
 
 def login_view(request):
     if request.user.is_authenticated:
         if request.user.is_superuser:
             return redirect('vehiculos_list')
     else:
-        # if there's not at least one admin user, create one
-        users = User.objects.filter(is_superuser=True)
-        if users.count() == 0:
-            user = User.objects.create_user('x', 'admin@admin.com', '123')
-            user.is_superuser = True
-            user.save()
         template = loader.get_template('login.html')
         context = {}
         return HttpResponse(template.render(context, request))
@@ -51,6 +46,11 @@ def login_intent(request):
 
 def vehiculos_list(request):
     lista_vehiculos = Vehiculo.objects.all()
+    for vehiculo in lista_vehiculos:
+        vehiculo.placa = decrypt(vehiculo.placa)
+        vehiculo.chasis = decrypt(vehiculo.chasis)
+        vehiculo.propietario = decrypt(vehiculo.propietario)
+        vehiculo.propietario.replace("_", " ")
     return render(request, 'vehiculos_list.html', {'lista_vehiculos': lista_vehiculos})
 
 
@@ -59,6 +59,9 @@ def registrar_vehiculo(request):
         form = VehiculoForm(request.POST)
         if form.is_valid():
             vehiculo = form.save(commit=False)
+            vehiculo.placa = encrypt(vehiculo.placa)
+            vehiculo.chasis = encrypt(vehiculo.chasis)
+            vehiculo.propietario = encrypt(vehiculo.propietario)
             vehiculo.save()
             aux = str(vehiculo.pk)
             loger = LogEntry(user=request.user, object_id=vehiculo.pk,
@@ -75,10 +78,19 @@ def registrar_vehiculo(request):
 
 def editar_vehiculo(request, pk):
     vehiculo = get_object_or_404(Vehiculo, pk=pk)
+    vehiculo.placa = decrypt(vehiculo.placa)
+    vehiculo.chasis = decrypt(vehiculo.chasis)
+    vehiculo.propietario = decrypt(vehiculo.propietario)
+    vehiculo.propietario.replace("_", " ")
     if request.method == "POST":
         form = VehiculoForm(request.POST, instance=vehiculo)
         if form.is_valid():
             vehiculo = form.save(commit=False)
+            vehiculo.placa = encrypt(vehiculo.placa)
+            vehiculo.chasis = encrypt(vehiculo.chasis)
+            vehiculo.propietario.replace(" ", ",")
+            print(vehiculo.propietario)
+            vehiculo.propietario = encrypt(vehiculo.propietario)
             vehiculo.save()
             aux = str(vehiculo.pk)
             loger = LogEntry(user=request.user, object_id=vehiculo.pk,
@@ -95,6 +107,7 @@ def editar_vehiculo(request, pk):
 
 def listar_multas(request, pk):
     vehiculo = get_object_or_404(Vehiculo, pk=pk)
+    vehiculo.placa = decrypt(vehiculo.placa)
     lista_multas = Multa.objects.filter(vehiculo=vehiculo)
     return render(request, 'multas_list.html', {'lista_multas': lista_multas, 'vehiculo': vehiculo})
 
@@ -125,16 +138,17 @@ def consultar_vehiculo(request):
     dato = request.POST.get('dato')
     if opcion == 'Placa':
         try:
-            vehiculo = Vehiculo.objects.get(placa=dato)
+            vehiculo = Vehiculo.get_vehiculo_by_placa(self=Vehiculo(), dato=dato)
         except Vehiculo.DoesNotExist:
             messages.error(request, 'La placa ingresada no existe')
             return redirect('authentication')
     else:
         try:
-            vehiculo = Vehiculo.objects.get(chasis=dato)
+            vehiculo = Vehiculo.get_vehiculo_by_chasis(self=Vehiculo(), dato=dato)
         except Vehiculo.DoesNotExist:
             messages.error(request, 'El chasis ingresado no existe')
             return redirect('authentication')
+    vehiculo.placa = decrypt(vehiculo.placa)
     lista_multas = Multa.objects.filter(vehiculo=vehiculo)
     return render(request, 'consultar_vehiculo.html', {'lista_multas': lista_multas, 'vehiculo': vehiculo})
 
