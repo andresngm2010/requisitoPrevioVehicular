@@ -34,7 +34,8 @@
                         </div>
                     {% endif %}
                     {% if user.is_authenticated %}
-                        <a href="{% url 'authentication/logout_view' %}"><button class="btn btn-secondary button-salir" type="button" >Cerrar Sesión</button></a></span>
+                        <a href="{% url 'logs_list' %}"><button class="btn btn-secondary button-salir" type="button" >Ver logs</button></a>
+                        <a href="{% url 'authentication/logout_view' %}"><button class="btn btn-secondary button-salir" type="button" >Cerrar Sesión</button></a>
                     {% endif %}
                 </div>
             </nav>

@@ -1,9 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.http import HttpResponse, Http404
+from django.contrib.contenttypes.models import ContentTypeManager, ContentType
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.contrib import messages
+from django.contrib.admin.models import LogEntry
 
 from .models import Vehiculo, Multa
 from .forms import VehiculoForm, MultaForm
@@ -58,6 +60,13 @@ def registrar_vehiculo(request):
         if form.is_valid():
             vehiculo = form.save(commit=False)
             vehiculo.save()
+            aux = str(vehiculo.pk)
+            loger = LogEntry(user=request.user, object_id=vehiculo.pk,
+                             object_repr='Vehiculo object(' + aux + ')',
+                             content_type=ContentType.objects.get(app_label='appRequisitoPrevioVehicular',
+                                                                  model='vehiculo'), action_flag=1,
+                             change_message=[{"added": {'Vehiculo object(' + aux + ')'}}])
+            loger.save()
             return redirect('vehiculos_list')
     else:
         form = VehiculoForm()
@@ -71,6 +80,13 @@ def editar_vehiculo(request, pk):
         if form.is_valid():
             vehiculo = form.save(commit=False)
             vehiculo.save()
+            aux = str(vehiculo.pk)
+            loger = LogEntry(user=request.user, object_id=vehiculo.pk,
+                             object_repr='Vehiculo object(' + aux + ')',
+                             content_type=ContentType.objects.get(app_label='appRequisitoPrevioVehicular',
+                                                                  model='vehiculo'), action_flag=1,
+                             change_message=[{"updated": {'Vehiculo object(' + aux + ')'}}])
+            loger.save()
             return redirect('vehiculos_list')
     else:
         form = VehiculoForm(instance=vehiculo)
@@ -91,6 +107,13 @@ def registrar_multa(request, pk):
             multa = form.save(commit=False)
             multa.vehiculo = vehiculo
             multa.save()
+            aux = str(multa.pk)
+            loger = LogEntry(user=request.user, object_id=multa.pk,
+                             object_repr='Multa object(' + aux + ')',
+                             content_type=ContentType.objects.get(app_label='appRequisitoPrevioVehicular',
+                                                                  model='multa'), action_flag=1,
+                             change_message=[{"added": {'Multa object(' + aux + ')'}}])
+            loger.save()
             return redirect('vehiculos_list')
     else:
         form = MultaForm()
@@ -118,5 +141,17 @@ def consultar_vehiculo(request):
 
 def eliminar_vehiculo(request, pk):
     vehiculo = get_object_or_404(Vehiculo, pk=pk)
+    aux = str(vehiculo.pk)
     vehiculo.delete()
+    loger = LogEntry(user=request.user, object_id=vehiculo.pk,
+                     object_repr='Vehiculo object(' + aux + ')',
+                     content_type=ContentType.objects.get(app_label='appRequisitoPrevioVehicular',
+                                                          model='vehiculo'), action_flag=1,
+                     change_message=[{"delete": {'Vehiculo object(' + aux + ')'}}])
+    loger.save()
     return redirect('vehiculos_list')
+
+
+def logs_list(request):
+    lista_logs = LogEntry.objects.all()
+    return render(request, 'logs.html', {'lista_logs': lista_logs})
