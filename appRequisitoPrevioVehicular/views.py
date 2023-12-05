@@ -6,8 +6,8 @@ from django.template import loader
 from django.contrib import messages
 from django.contrib.admin.models import LogEntry
 
-from .models import Vehiculo, Multa
-from .forms import VehiculoForm, MultaForm
+from .models import Vehiculo, Multa, Usuario
+from .forms import VehiculoForm, MultaForm, UsuarioForm
 
 from appRequisitoPrevioVehicular.encrypt_util import *
 
@@ -46,11 +46,6 @@ def login_intent(request):
 
 def vehiculos_list(request):
     lista_vehiculos = Vehiculo.objects.all()
-    for vehiculo in lista_vehiculos:
-        vehiculo.placa = decrypt(vehiculo.placa)
-        vehiculo.chasis = decrypt(vehiculo.chasis)
-        vehiculo.propietario = decrypt(vehiculo.propietario)
-        vehiculo.propietario.replace("_", " ")
     return render(request, 'vehiculos_list.html', {'lista_vehiculos': lista_vehiculos})
 
 
@@ -59,9 +54,6 @@ def registrar_vehiculo(request):
         form = VehiculoForm(request.POST)
         if form.is_valid():
             vehiculo = form.save(commit=False)
-            vehiculo.placa = encrypt(vehiculo.placa)
-            vehiculo.chasis = encrypt(vehiculo.chasis)
-            vehiculo.propietario = encrypt(vehiculo.propietario)
             vehiculo.save()
             aux = str(vehiculo.pk)
             loger = LogEntry(user=request.user, object_id=vehiculo.pk,
@@ -75,22 +67,31 @@ def registrar_vehiculo(request):
         form = VehiculoForm()
     return render(request, 'registrar_vehiculo.html', {'form': form})
 
+def registrar_usuario(request):
+    if request.method == "POST":
+        form = UsuarioForm(request.POST)
+        if form.is_valid():
+            usuario = form.save(commit=False)
+            usuario.save()
+            aux = str(usuario.pk)
+            loger = LogEntry(user=request.user, object_id=usuario.pk,
+                             object_repr='Usuario object(' + aux + ')',
+                             content_type=ContentType.objects.get(app_label='appRequisitoPrevioVehicular',
+                                                                  model='usuario'), action_flag=1,
+                             change_message=[{"added": {'Usuario object(' + aux + ')'}}])
+            loger.save()
+            return redirect('vehiculos_list')
+    else:
+        form = UsuarioForm()
+    return render(request, 'registrar_usuario.html', {'form': form})
+
 
 def editar_vehiculo(request, pk):
     vehiculo = get_object_or_404(Vehiculo, pk=pk)
-    vehiculo.placa = decrypt(vehiculo.placa)
-    vehiculo.chasis = decrypt(vehiculo.chasis)
-    vehiculo.propietario = decrypt(vehiculo.propietario)
-    vehiculo.propietario.replace("_", " ")
     if request.method == "POST":
         form = VehiculoForm(request.POST, instance=vehiculo)
         if form.is_valid():
             vehiculo = form.save(commit=False)
-            vehiculo.placa = encrypt(vehiculo.placa)
-            vehiculo.chasis = encrypt(vehiculo.chasis)
-            vehiculo.propietario.replace(" ", ",")
-            print(vehiculo.propietario)
-            vehiculo.propietario = encrypt(vehiculo.propietario)
             vehiculo.save()
             aux = str(vehiculo.pk)
             loger = LogEntry(user=request.user, object_id=vehiculo.pk,
@@ -107,7 +108,7 @@ def editar_vehiculo(request, pk):
 
 def listar_multas(request, pk):
     vehiculo = get_object_or_404(Vehiculo, pk=pk)
-    vehiculo.placa = decrypt(vehiculo.placa)
+    vehiculo.placa = vehiculo.placa
     lista_multas = Multa.objects.filter(vehiculo=vehiculo)
     return render(request, 'multas_list.html', {'lista_multas': lista_multas, 'vehiculo': vehiculo})
 
@@ -148,7 +149,7 @@ def consultar_vehiculo(request):
         except Vehiculo.DoesNotExist:
             messages.error(request, 'El chasis ingresado no existe')
             return redirect('authentication')
-    vehiculo.placa = decrypt(vehiculo.placa)
+    vehiculo.placa = vehiculo.placa
     lista_multas = Multa.objects.filter(vehiculo=vehiculo)
     return render(request, 'consultar_vehiculo.html', {'lista_multas': lista_multas, 'vehiculo': vehiculo})
 

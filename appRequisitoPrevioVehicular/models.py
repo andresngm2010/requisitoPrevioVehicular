@@ -3,6 +3,12 @@ from django.conf import settings
 
 from appRequisitoPrevioVehicular.encrypt_util import *
 
+class Usuario(models.Model):
+    nombre = models.CharField(max_length=50)
+    apellido = models.CharField(max_length=50)
+    email = models.EmailField()
+    cedula = models.CharField(max_length=10)
+    telefono = models.CharField(max_length=10)
 
 class Vehiculo(models.Model):
     propietario = models.CharField(max_length=50)
@@ -15,7 +21,7 @@ class Vehiculo(models.Model):
     def get_vehiculo_by_placa(self, dato):
         lista_vehiculos = Vehiculo.objects.all()
         for vehiculo in lista_vehiculos:
-            aux = decrypt(vehiculo.placa)
+            aux = vehiculo.placa
             if aux == dato:
                 return vehiculo
             else:
@@ -27,7 +33,7 @@ class Vehiculo(models.Model):
     def get_vehiculo_by_chasis(self, dato):
         lista_vehiculos = Vehiculo.objects.all()
         for vehiculo in lista_vehiculos:
-            aux = decrypt(vehiculo.chasis)
+            aux = vehiculo.chasis
             if aux == dato:
                 return vehiculo
             else:

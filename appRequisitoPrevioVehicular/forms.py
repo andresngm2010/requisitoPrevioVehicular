@@ -1,6 +1,12 @@
 from django import forms
 
-from .models import Vehiculo, Multa
+from .models import Vehiculo, Multa, Usuario
+
+class UsuarioForm(forms.ModelForm):
+
+    class Meta:
+        model = Usuario
+        fields = ('nombre', 'apellido', 'email', 'cedula', 'telefono' )
 
 class VehiculoForm(forms.ModelForm):
 
