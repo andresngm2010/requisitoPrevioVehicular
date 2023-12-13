@@ -49,6 +49,11 @@ def vehiculos_list(request):
     return render(request, 'vehiculos_list.html', {'lista_vehiculos': lista_vehiculos})
 
 
+def usuarios_list(request):
+    lista_usuarios = Usuario.objects.all()
+    return render(request, 'usuarios_list.html', {'lista_usuarios': lista_usuarios})
+
+
 def registrar_vehiculo(request):
     if request.method == "POST":
         form = VehiculoForm(request.POST)
