@@ -175,3 +175,27 @@ def eliminar_vehiculo(request, pk):
 def logs_list(request):
     lista_logs = LogEntry.objects.all()
     return render(request, 'logs.html', {'lista_logs': lista_logs})
+
+
+def pagar_multa(request):
+    quito = {
+        "Nombre" : "Quito",
+        "Agencias" : ["Coruña", "San Juan"]
+    }
+    sanmiguel = {
+        "Nombre" : "San Miguel",
+        "Agencias" : ["miguel", "san"]
+    }
+    ###guayaquil = ['centro', 'urdesa']
+    ###duran = ['duran1', 'duran2']
+    ###guayas = [guayaquil, duran]
+    pichincha = {
+        "Nombre" : "Pichincha",
+        "Provincias" : {quito, sanmiguel}
+    }
+    provincias = [pichincha, guayas]
+    return render(request, 'pagar_multa.html', {'provincias': provincias})
+
+def pagar_multa2(request, provincia):
+    cantones = []
+    return render(request, 'pagar_multa.html', {'cantones': cantones})

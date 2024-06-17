@@ -15,4 +15,5 @@ urlpatterns = [
     path('eliminar_vehiculo/<int:pk>', views.eliminar_vehiculo, name='eliminar_vehiculo'),
     path('logs_list', views.logs_list, name='logs_list'),
     path('logout', views.logout_view, name='authentication/logout_view'),
+    path('pagar_multa', views.pagar_multa, name='pagar_multa'),
 ]

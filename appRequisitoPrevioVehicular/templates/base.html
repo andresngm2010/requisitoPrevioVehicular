@@ -27,9 +27,9 @@
                         <div class="navbar navbar-dark">
                             <form method="post" action="{% url 'authentication/login_intent' %}" >
                                 {% csrf_token %}
+                                <button type="submit">Entrar</button>
                                 <input type="text" name="usuario" value="" placeholder="Usuario" required>
                                 <input type="password" name="contraseña" value="" placeholder="Contraseña" required>
-                                <button class="button-ingresar" type="submit">Ingresar</button>
                             </form>
                         </div>
                     {% endif %}
