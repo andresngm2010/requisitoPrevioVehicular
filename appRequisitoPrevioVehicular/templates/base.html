@@ -12,6 +12,8 @@
         <link rel="stylesheet" href="{% static 'css/contenedor.css'%}">
         <link rel="stylesheet" href="{% static 'css/login.css' %}">
         <link rel="stylesheet" href="{% static 'css/consulta.css' %}">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{% static 'js/carga_cantones.js' %}"></script>
         <title>Agencia Nacional Transito</title>
     </head>
     <body>
@@ -19,9 +21,9 @@
             <nav class="navbar navbar-dark color-azul">
                 <div class="container-fluid">
                     <div class="h-10 w-10 texto-transito">
-                        <span class="navbar-brand m-0 h1 agencia" style="color: #03363d">Proyecto para la prueba de</span>
+                        <span class="navbar-brand m-0 h1 agencia" style="color: #03363d">Proyecto para el Workshop de</span>
                         <br>
-                        <span class="navbar-brand m-0 h1 agencia" style="color: #03363d">APIS</span>
+                        <span class="navbar-brand m-0 h1 agencia" style="color: #03363d">UFT</span>
                     </div>
                     {% if not user.is_authenticated %}
                         <div class="navbar navbar-dark">
@@ -46,7 +48,7 @@
         {% endblock %}
         <footer>
             <div class="pie">
-                <p>Escuela Politécnica Nacional <br> Facultad de Sistemas <br> Ingeniería de Software</p>
+                <p>Derechos Reservados <br> SAGGA <br> Webinar de UFT</p>
             </div>
         </footer>
     </body>

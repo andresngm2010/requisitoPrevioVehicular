@@ -1,13 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.contrib import messages
 from django.contrib.admin.models import LogEntry
 
-from .models import Vehiculo, Multa, Usuario
-from .forms import VehiculoForm, MultaForm, UsuarioForm
+from .models import Vehiculo, Multa, Usuario, Provincia, Canton, Agencia
+from .forms import VehiculoForm, MultaForm, UsuarioForm, UbicacionForm
 
 from appRequisitoPrevioVehicular.encrypt_util import *
 
@@ -177,25 +177,18 @@ def logs_list(request):
     return render(request, 'logs.html', {'lista_logs': lista_logs})
 
 
-def pagar_multa(request):
-    quito = {
-        "Nombre" : "Quito",
-        "Agencias" : ["Coruña", "San Juan"]
-    }
-    sanmiguel = {
-        "Nombre" : "San Miguel",
-        "Agencias" : ["miguel", "san"]
-    }
-    ###guayaquil = ['centro', 'urdesa']
-    ###duran = ['duran1', 'duran2']
-    ###guayas = [guayaquil, duran]
-    pichincha = {
-        "Nombre" : "Pichincha",
-        "Provincias" : {quito, sanmiguel}
-    }
-    provincias = [pichincha, guayas]
-    return render(request, 'pagar_multa.html', {'provincias': provincias})
+def cargar_cantones(request):
+    provincia_id = request.GET.get('provincia_id')
+    cantones = Canton.objects.filter(provincia_id=provincia_id).order_by('nombre')
+    return JsonResponse(list(cantones.values('id', 'nombre')), safe=False)
 
-def pagar_multa2(request, provincia):
-    cantones = []
-    return render(request, 'pagar_multa.html', {'cantones': cantones})
+
+def cargar_agencias(request):
+    canton_id = request.GET.get('canton_id')
+    agencias = Agencia.objects.filter(canton_id=canton_id).order_by('nombre')
+    return JsonResponse(list(agencias.values('id', 'nombre')), safe=False)
+
+
+def ubicacion_view(request):
+    form = UbicacionForm()
+    return render(request, 'pagar_multa.html', {'form': form})

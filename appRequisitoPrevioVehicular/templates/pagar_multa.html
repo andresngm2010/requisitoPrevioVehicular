@@ -8,28 +8,6 @@
                 <form method="POST">{% csrf_token %}
                     {{ form.as_p }}
 
-                    <div class="ejemplo">
-                        <p>Provincia</p>
-                        <select name="selectP">
-                            {% for provincia in provincias %}
-                                <option value="value1">{{ provincia[0] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                    <p>Canton</p>
-                        <select name="selectC">
-                            {% for provincia in provincias[0] %}
-                                <option value="value1">{{ provincia[0][0] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <p>Agencia</p>
-                        <select name="selectA">
-                            <option value="value1">Sangolqui</option>
-                        </select>
-                    </div>
                     <div class="botones">
                         <div class="botonIzq">
                             <button class="botonInterno" type="submit">PAGAR</button>
