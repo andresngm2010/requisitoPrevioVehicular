@@ -23,9 +23,9 @@ class MultaForm(forms.ModelForm):
 
 
 class UbicacionForm(forms.Form):
-    provincia = forms.ModelChoiceField(queryset=Provincia.objects.all(), empty_label="Seleccione una provincia")
-    canton = forms.ModelChoiceField(queryset=Canton.objects.none(), empty_label="Seleccione un cantón")
-    agencia = forms.ModelChoiceField(queryset=Agencia.objects.none(), empty_label="Seleccione una agencia")
+    provincia = forms.ModelChoiceField(queryset=Provincia.objects.all())
+    canton = forms.ModelChoiceField(queryset=Canton.objects.none())
+    agencia = forms.ModelChoiceField(queryset=Agencia.objects.none())
 
 
     class Media:

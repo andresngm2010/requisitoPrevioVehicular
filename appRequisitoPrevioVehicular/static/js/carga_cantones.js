@@ -5,12 +5,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     provinciaSelect.addEventListener('change', function() {
         const provinciaId = provinciaSelect.value;
+        cantonSelect.innerHTML = '';  // Limpiar opciones previas
+        agenciaSelect.innerHTML = ''; // Limpiar opciones previas
+
         if (provinciaId) {
             fetch(`/cargar-cantones/?provincia_id=${provinciaId}`)
                 .then(response => response.json())
                 .then(data => {
-                    cantonSelect.innerHTML = '<option value="">Seleccione un cantón</option>';
-                    agenciaSelect.innerHTML = '<option value="">Seleccione una agencia</option>';
                     data.forEach(canton => {
                         const option = document.createElement('option');
                         option.value = canton.id;
@@ -18,19 +19,17 @@ document.addEventListener("DOMContentLoaded", function() {
                         cantonSelect.appendChild(option);
                     });
                 });
-        } else {
-            cantonSelect.innerHTML = '<option value="">Seleccione un cantón</option>';
-            agenciaSelect.innerHTML = '<option value="">Seleccione una agencia</option>';
         }
     });
 
     cantonSelect.addEventListener('change', function() {
         const cantonId = cantonSelect.value;
+        agenciaSelect.innerHTML = '';  // Limpiar opciones previas
+
         if (cantonId) {
             fetch(`/cargar-agencias/?canton_id=${cantonId}`)
                 .then(response => response.json())
                 .then(data => {
-                    agenciaSelect.innerHTML = '<option value="">Seleccione una agencia</option>';
                     data.forEach(agencia => {
                         const option = document.createElement('option');
                         option.value = agencia.id;
@@ -38,8 +37,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         agenciaSelect.appendChild(option);
                     });
                 });
-        } else {
-            agenciaSelect.innerHTML = '<option value="">Seleccione una agencia</option>';
         }
     });
 });
