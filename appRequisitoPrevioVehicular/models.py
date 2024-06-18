@@ -20,12 +20,12 @@ class Vehiculo(models.Model):
 
     def get_vehiculo_by_placa(self, dato):
         lista_vehiculos = Vehiculo.objects.all()
+        vehiculo1 = Vehiculo.objects.get(placa=dato)
         for vehiculo in lista_vehiculos:
             aux = vehiculo.placa
             if aux == dato:
                 return vehiculo
-            else:
-                raise Vehiculo.DoesNotExist(
+        raise Vehiculo.DoesNotExist(
                 "%s matching query does not exist." % Vehiculo._meta.object_name
             )
 
@@ -36,8 +36,7 @@ class Vehiculo(models.Model):
             aux = vehiculo.chasis
             if aux == dato:
                 return vehiculo
-            else:
-                raise Vehiculo.DoesNotExist(
+        raise Vehiculo.DoesNotExist(
                 "%s matching query does not exist." % Vehiculo._meta.object_name
             )
 
